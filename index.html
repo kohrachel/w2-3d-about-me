@@ -1,0 +1,1058 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Interactive About Me</title>
+    <!-- Three.js Dependencies will be imported via ES6 modules in the script tag -->
+    <style>
+      /* Basic CSS Reset */
+      body {
+        margin: 0;
+        font-family: Arial, sans-serif;
+        overflow: hidden; /* Prevent scrollbars caused by canvas */
+      }
+
+      /* Canvas Styling */
+      #bg {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        display: block; /* Removes potential small gap below canvas */
+      }
+
+      /* --- Modal Base Styles (Placeholder) --- */
+      .modal {
+        display: none; /* Hidden by default */
+        position: fixed;
+        z-index: 100; /* Ensure modals are on top */
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        width: 80%;
+        max-width: 500px;
+        background-color: rgba(255, 255, 255, 0.95);
+        padding: 25px;
+        border-radius: 10px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        text-align: center;
+        border: 1px solid #ccc;
+        transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
+      }
+
+      .modal-content h2 {
+        margin-top: 0;
+        color: #333;
+      }
+
+      .modal-content p {
+        color: #555;
+        line-height: 1.6;
+      }
+
+      .close-button {
+        position: absolute;
+        top: 10px;
+        right: 15px;
+        font-size: 24px;
+        font-weight: bold;
+        color: #888;
+        cursor: pointer;
+        border: none;
+        background: none;
+      }
+      .close-button:hover {
+        color: #555;
+      }
+
+      /* --- Diary Puzzle Styles (Placeholder) --- */
+      #diary-password-input {
+        margin-top: 15px;
+        padding: 8px;
+        width: 60%;
+      }
+      #diary-submit-button {
+        padding: 8px 15px;
+        margin-left: 5px;
+        cursor: pointer;
+      }
+      #diary-feedback {
+        margin-top: 10px;
+        font-weight: bold;
+      }
+      .success {
+        color: green;
+      }
+      .failure {
+        color: red;
+      }
+
+      /* --- Loading Screen (Placeholder) --- */
+      #loading-screen {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: #f0f0f0;
+        display: flex; /* Use flexbox */
+        justify-content: center; /* Center horizontally */
+        align-items: center; /* Center vertically */
+        z-index: 200; /* Above everything else initially */
+        font-size: 1.5em;
+        color: #555;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Canvas for Three.js rendering -->
+    <canvas id="bg"></canvas>
+
+    <!-- Loading Screen -->
+    <div id="loading-screen">Loading...</div>
+
+    <!-- Modal HTML Structure (Hidden by default) -->
+    <div id="laptop-modal" class="modal">
+      <button class="close-button" data-modal-id="laptop-modal">×</button>
+      <div class="modal-content">
+        <h2>Coding & Tech</h2>
+        <p>
+          This represents my passion for software development! I love building
+          things with code, exploring new technologies, and solving challenging
+          problems. Currently diving deeper into [mention a specific tech like
+          WebGL, AI, backend framework, etc.].
+        </p>
+      </div>
+    </div>
+
+    <div id="boba-modal" class="modal">
+      <button class="close-button" data-modal-id="boba-modal">×</button>
+      <div class="modal-content">
+        <h2>Favorite Drink: Boba!</h2>
+        <p>
+          Can't resist a good boba tea. My go-to is usually [Your favorite
+          flavor, e.g., Taro Milk Tea with Pearls] or sometimes [Another
+          favorite/seasonal option]. It's my little treat while coding or
+          relaxing.
+        </p>
+      </div>
+    </div>
+
+    <div id="headphones-modal" class="modal">
+      <button class="close-button" data-modal-id="headphones-modal">×</button>
+      <div class="modal-content">
+        <h2>Music Vibes</h2>
+        <p>
+          Music is essential for my focus and mood. I often listen to [Your
+          favorite genre(s), e.g., Lofi Hip Hop, Electronic, Classical] while
+          working or commuting. Current favorite artist/track: [Mention one].
+        </p>
+      </div>
+    </div>
+
+    <div id="puzzle-modal" class="modal">
+      <button class="close-button" data-modal-id="puzzle-modal">×</button>
+      <div class="modal-content">
+        <h2>Problem Solving</h2>
+        <p>
+          Like fitting puzzle pieces together, I enjoy tackling complex
+          challenges, whether in code, strategy games, or real life. Breaking
+          down problems and finding elegant solutions is incredibly satisfying.
+        </p>
+      </div>
+    </div>
+
+    <div id="book-modal" class="modal">
+      <button class="close-button" data-modal-id="book-modal">×</button>
+      <div class="modal-content">
+        <h2>Reading Adventures</h2>
+        <p>
+          Love getting lost in a good book. The Famous Five series was a
+          childhood favorite! Now I enjoy [Your current reading genre(s), e.g.,
+          Sci-Fi, Fantasy, Non-Fiction]. Currently reading: [Current book, if
+          any].
+        </p>
+      </div>
+    </div>
+
+    <div id="diary-modal" class="modal">
+      <button class="close-button" data-modal-id="diary-modal">×</button>
+      <div class="modal-content">
+        <h2>My Thoughts (Locked)</h2>
+        <p>
+          This diary holds some personal reflections... but it's locked! Can you
+          guess the password?
+        </p>
+        <input
+          type="password"
+          id="diary-password-input"
+          placeholder="Enter password"
+        />
+        <button id="diary-submit-button">Unlock</button>
+        <p id="diary-feedback"></p>
+        <div
+          id="diary-content"
+          style="
+            display: none;
+            margin-top: 15px;
+            text-align: left;
+            background-color: #fff8e1;
+            padding: 10px;
+            border-radius: 5px;
+          "
+        >
+          <h4>Unlocked!</h4>
+          <p>
+            Well done! You found the key. This represents my appreciation for
+            privacy but also the joy of sharing thoughts with those who make an
+            effort. Maybe it hints at an interest in security or just a playful
+            secret!
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- JavaScript Code -->
+    <script type="importmap">
+      {
+        "imports": {
+          "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+          "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+        }
+      }
+    </script>
+    <script type="module">
+      // Import necessary Three.js modules
+      import * as THREE from "three";
+      import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+      // Potential imports for Step 4, add if needed for complex shapes later
+      // import { TubeGeometry } from 'three/addons/geometries/TubeGeometry.js'; // For headphones maybe
+      // import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+
+      console.log("Three.js version:", THREE.REVISION);
+
+      // --- Global Variables ---
+      let scene, camera, renderer, controls;
+      let clickableObjects = []; // Will be populated in Step 5
+      let raycaster, mouse;
+      const clock = new THREE.Clock();
+      const textureLoader = new THREE.TextureLoader();
+
+      // --- Initialization ---
+      // --- Initialization ---
+      function init() {
+        console.log(
+          "Initializing Scene (Steps 2, 3 & 4 - Side View Cam Attempt 2)..."
+        );
+
+        // 1. Scene
+        scene = new THREE.Scene();
+        scene.background = new THREE.Color(0x87ceeb); // Or your preferred background color
+
+        // 2. Camera (Side View Position)
+        const fov = 75;
+        const aspect = window.innerWidth / window.innerHeight;
+        const near = 0.1;
+        const far = 1000;
+        camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
+        // *** CAMERA POSITION FOR SIDE VIEW ***
+        // Positioned to the right (X=3.5), slightly elevated (Y=1.8), slightly in front of desk Z (Z=-0.5)
+        camera.position.set(0, 5.0, 0.8); // Adjust these values as needed
+
+        // 3. Renderer
+        const canvas = document.querySelector("#bg");
+        renderer = new THREE.WebGLRenderer({
+          canvas: canvas,
+          antialias: true,
+        });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        renderer.shadowMap.enabled = true;
+        renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+
+        // 4. OrbitControls (Check Target)
+        controls = new OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
+        controls.dampingFactor = 0.05;
+        controls.screenSpacePanning = false;
+        controls.minDistance = 1.5;
+        controls.maxDistance = 15;
+        controls.maxPolarAngle = Math.PI / 1.8;
+
+        // *** ENSURE TARGET MATCHES DESK POSITION ***
+        const targetDeskPosX = -3.4; // <-- UPDATE X to match deskGroup's new X position
+        const targetDeskPosZ = -3.4; // Keep Z the same (against back wall)
+        const targetDeskHeight = 1.0;
+        const deskSurfaceYTarget = targetDeskHeight - 0.1;
+
+        // Set target to the new center of the desk
+        controls.target.set(targetDeskPosX, deskSurfaceYTarget, targetDeskPosZ);
+
+        controls.update();
+
+        // Apply initial controls settings
+        controls.update();
+
+        // 5. Room Structure
+        createRoom(); // Should have ceiling removed
+
+        // 6. Desk Area Setup
+        createDeskArea(); // Should have deskGroup.rotation.y = 0 set inside
+
+        // 7. Basic Lighting
+        addLighting();
+
+        // 8. Handle Window Resize
+        window.addEventListener("resize", onWindowResize, false);
+
+        // 9. Start Animation Loop
+        animate(); // Start rendering loop
+
+        setupInteraction();
+
+        // 10. Hide Loading Screen
+        try {
+          const loadingScreen = document.getElementById("loading-screen");
+          if (loadingScreen) {
+            loadingScreen.style.display = "none";
+          } else {
+            console.error("Loading screen element not found!");
+          }
+        } catch (e) {
+          console.error("Error hiding loading screen:", e);
+        }
+
+        console.log(
+          "Scene Initialized. Desk parallel, camera side view. Target:",
+          controls.target
+        ); // Log target for verification
+      }
+
+      // ... (createRoom function - unchanged) ...
+      function createRoom() {
+        // --- Load Textures ---
+        const floorTexture = textureLoader.load(
+          "assets/textures/wood_floor.jpg"
+        );
+        const wallTexture = textureLoader.load(
+          "assets/textures/white_wall.jpg"
+        );
+        const frameTexture = textureLoader.load(
+          "assets/textures/wood_frame.jpg"
+        );
+
+        floorTexture.wrapS = floorTexture.wrapT = THREE.RepeatWrapping;
+        floorTexture.repeat.set(4, 4);
+        wallTexture.wrapS = wallTexture.wrapT = THREE.RepeatWrapping;
+        wallTexture.repeat.set(2, 1);
+
+        // --- Materials ---
+        const wallMaterial = new THREE.MeshStandardMaterial({
+          map: wallTexture,
+          side: THREE.DoubleSide,
+        });
+        const floorMaterial = new THREE.MeshStandardMaterial({
+          map: floorTexture,
+          side: THREE.DoubleSide,
+        });
+        const frameMaterial = new THREE.MeshStandardMaterial({
+          map: frameTexture,
+        });
+        const glassMaterial = new THREE.MeshStandardMaterial({
+          color: 0xadd8e6, // Light blue tint
+          transparent: true,
+          opacity: 0.3,
+          side: THREE.DoubleSide,
+        });
+
+        // Floor
+        const floorGeometry = new THREE.BoxGeometry(10, 0.2, 10);
+        const floor = new THREE.Mesh(floorGeometry, floorMaterial);
+        floor.position.y = -0.1;
+        floor.receiveShadow = true;
+        scene.add(floor);
+
+        // Back Wall
+        const backWallGeometry = new THREE.BoxGeometry(10, 5, 0.2);
+        const backWall = new THREE.Mesh(backWallGeometry, wallMaterial);
+        backWall.position.set(0, 2.5 - 0.1, -5);
+        backWall.castShadow = true;
+        backWall.receiveShadow = true;
+        scene.add(backWall);
+
+        // Left Wall
+        const leftWallGeometry = new THREE.BoxGeometry(0.2, 5, 10);
+        const leftWall = new THREE.Mesh(leftWallGeometry, wallMaterial);
+        leftWall.position.set(-5, 2.5 - 0.1, 0);
+        leftWall.castShadow = true;
+        leftWall.receiveShadow = true;
+        scene.add(leftWall);
+
+        // --- Create Window ---
+        const windowHeight = 2.0;
+        const windowWidth = 3.0;
+        const windowPosY = 2.5;
+        const windowPosZ = -5.01;
+        const frameThickness = 0.15;
+        const glassGeometry = new THREE.PlaneGeometry(
+          windowWidth,
+          windowHeight
+        );
+        const glass = new THREE.Mesh(glassGeometry, glassMaterial);
+        glass.position.set(0, windowPosY, windowPosZ);
+        scene.add(glass);
+        const frameTopGeometry = new THREE.BoxGeometry(
+          windowWidth + frameThickness * 2,
+          frameThickness,
+          frameThickness
+        );
+        const frameTop = new THREE.Mesh(frameTopGeometry, frameMaterial);
+        frameTop.position.set(
+          0,
+          windowPosY + windowHeight / 2 + frameThickness / 2,
+          windowPosZ
+        );
+        frameTop.castShadow = true;
+        scene.add(frameTop);
+        const frameBottomGeometry = new THREE.BoxGeometry(
+          windowWidth + frameThickness * 2,
+          frameThickness,
+          frameThickness
+        );
+        const frameBottom = new THREE.Mesh(frameBottomGeometry, frameMaterial);
+        frameBottom.position.set(
+          0,
+          windowPosY - windowHeight / 2 - frameThickness / 2,
+          windowPosZ
+        );
+        frameBottom.castShadow = true;
+        scene.add(frameBottom);
+        const frameLeftGeometry = new THREE.BoxGeometry(
+          frameThickness,
+          windowHeight + frameThickness * 2,
+          frameThickness
+        );
+        const frameLeft = new THREE.Mesh(frameLeftGeometry, frameMaterial);
+        frameLeft.position.set(
+          -windowWidth / 2 - frameThickness / 2,
+          windowPosY,
+          windowPosZ
+        );
+        frameLeft.castShadow = true;
+        scene.add(frameLeft);
+        const frameRightGeometry = new THREE.BoxGeometry(
+          frameThickness,
+          windowHeight + frameThickness * 2,
+          frameThickness
+        );
+        const frameRight = new THREE.Mesh(frameRightGeometry, frameMaterial);
+        frameRight.position.set(
+          windowWidth / 2 + frameThickness / 2,
+          windowPosY,
+          windowPosZ
+        );
+        frameRight.castShadow = true;
+        scene.add(frameRight);
+      }
+
+      // --- Step 4: Create Desk and Objects ---
+      function createDeskArea() {
+        console.log("Refactoring Desk Area with Group, Larger Objects...");
+
+        // --- Desk Group Setup ---
+        const deskGroup = new THREE.Group();
+        scene.add(deskGroup);
+
+        // Desk Dimensions and Position (as before)
+        const deskWidth = 6;
+        const deskHeight = 2;
+        const deskDepth = 3;
+        const deskThickness = 0.1;
+        const legThickness = 0.15;
+        const deskBaseY = -0.1; // Floor level offset
+        const deskSurfaceY = deskHeight - deskBaseY; // Y position of the desk surface relative to floor
+
+        // Position the entire group
+        const deskGroupPosZ = -2.0; // How far back the desk center is
+        // *** UPDATE DESK GROUP X POSITION ***
+        const deskGroupPosX = -3.4; // Calculated X to align left edge with left wall
+
+        // Set the final position
+        deskGroup.position.set(deskGroupPosX, deskBaseY, deskGroupPosZ); // Use new X, keep Y and Z
+        // Apply YOUR desired rotation to the GROUP
+        // Example: Rotate 15 degrees around the Y axis (vertical axis)
+        deskGroup.rotation.y = THREE.MathUtils.degToRad(90); // <--- APPLY YOUR ROTATION HERE (in radians)
+
+        // Desk Material (as before)
+        const deskTexture = textureLoader.load(
+          "assets/textures/wood_frame.jpg"
+        );
+        deskTexture.wrapS = deskTexture.wrapT = THREE.RepeatWrapping;
+        deskTexture.repeat.set(4, 2);
+        const deskMaterial = new THREE.MeshStandardMaterial({
+          map: deskTexture,
+          metalness: 0.1,
+          roughness: 0.8,
+        }); // Added slight metalness/roughness
+
+        // --- Add Desk Parts to the Group ---
+        // Desk Top - Positioned relative to the group's origin (0,0,0) which is at floor level center
+        const deskTopGeo = new THREE.BoxGeometry(
+          deskWidth,
+          deskThickness,
+          deskDepth
+        );
+        const deskTop = new THREE.Mesh(deskTopGeo, deskMaterial);
+        // Y position is the height minus half its own thickness
+        deskTop.position.y = deskSurfaceY - deskThickness / 2;
+        deskTop.castShadow = true;
+        deskTop.receiveShadow = true;
+        deskTop.name = "Desk";
+        deskGroup.add(deskTop); // Add to group
+
+        // Desk Legs - Positioned relative to the group's origin
+        const legHeight = deskSurfaceY - deskThickness; // Height relative to floor
+        const legInset = 0.3;
+        const legPositions = [
+          {
+            x: -deskWidth / 2 + legThickness / 2 + legInset,
+            z: -deskDepth / 2 + legThickness / 2 + legInset,
+          },
+          {
+            x: deskWidth / 2 - legThickness / 2 - legInset,
+            z: -deskDepth / 2 + legThickness / 2 + legInset,
+          },
+          {
+            x: -deskWidth / 2 + legThickness / 2 + legInset,
+            z: deskDepth / 2 - legThickness / 2 - legInset,
+          },
+          {
+            x: deskWidth / 2 - legThickness / 2 - legInset,
+            z: deskDepth / 2 - legThickness / 2 - legInset,
+          },
+        ];
+
+        legPositions.forEach((pos) => {
+          const legGeo = new THREE.BoxGeometry(
+            legThickness,
+            legHeight,
+            legThickness
+          );
+          const leg = new THREE.Mesh(legGeo, deskMaterial);
+          // Y position is half the height, relative to group's base (floor)
+          leg.position.set(pos.x, legHeight / 2, pos.z);
+          leg.castShadow = true;
+          leg.receiveShadow = true;
+          deskGroup.add(leg); // Add to group
+        });
+
+        // --- Objects on Desk ---
+        // Y position for objects is now relative to the group's base Y (which is -0.1)
+        const objectBaseY = deskSurfaceY + 0.01; // Slightly above desk surface height
+
+        // Object Scale Factor
+        const scale = 1.7; // Make objects 50% larger
+
+        // Clickable Objects array
+        clickableObjects = []; // Clear the array before populating
+
+        // Laptop (Larger, Repositioned)
+        const laptopWidth = 0.8 * scale;
+        const laptopDepth = 0.6 * scale;
+        const laptopBaseHeight = 0.05 * scale;
+        const laptopScreenHeight = 0.45 * scale;
+
+        const laptopBaseGeo = new THREE.BoxGeometry(
+          laptopWidth,
+          laptopBaseHeight,
+          laptopDepth
+        );
+        const keyboardMat = new THREE.MeshStandardMaterial({
+          color: 0x333333,
+          roughness: 0.6,
+        });
+        const laptopBase = new THREE.Mesh(laptopBaseGeo, keyboardMat);
+        // Position relative to desk center (0, deskSurfaceY, 0) within the group
+        laptopBase.position.set(-0.5, objectBaseY + laptopBaseHeight / 2, -0.3); // Closer to left edge, slightly back
+        laptopBase.rotation.y = THREE.MathUtils.degToRad(-10); // Angle slightly
+        laptopBase.castShadow = true;
+        laptopBase.receiveShadow = true;
+        laptopBase.name = "Laptop";
+        deskGroup.add(laptopBase); // Add to group
+        clickableObjects.push(laptopBase); // Add to clickableObjects array
+        const laptopScreenGeo = new THREE.BoxGeometry(
+          laptopWidth,
+          laptopScreenHeight,
+          0.02 * scale
+        );
+        const screenMat = new THREE.MeshStandardMaterial({
+          color: 0x000000,
+          emissive: 0x66ccff,
+          emissiveIntensity: 0.6,
+          roughness: 0.9,
+        });
+        const laptopScreen = new THREE.Mesh(laptopScreenGeo, screenMat);
+        // Position relative to base (unchanged logic, just uses scaled dimensions)
+        laptopScreen.position.set(
+          0,
+          laptopBaseHeight / 2 + (laptopScreenHeight / 2) * Math.cos(0.2),
+          -laptopDepth / 2 + (laptopScreenHeight / 2) * Math.sin(0.2)
+        );
+        laptopScreen.rotation.x = -0.2; // Angle screen back
+        laptopBase.add(laptopScreen); // Add screen as child of base
+
+        // Boba Cup (Larger, Repositioned)
+        const cupRadius = 0.1 * scale;
+        const cupHeight = 0.25 * scale;
+        const bobaGeo = new THREE.CylinderGeometry(
+          cupRadius,
+          cupRadius * 0.8,
+          cupHeight,
+          16
+        );
+        const bobaMat = new THREE.MeshStandardMaterial({
+          color: 0xe8d5c4,
+          transparent: true,
+          opacity: 0.8,
+          roughness: 0.2,
+        });
+        const bobaCup = new THREE.Mesh(bobaGeo, bobaMat);
+        // Position relative to desk center
+        bobaCup.position.set(1.5, objectBaseY + cupHeight / 2, 0.8); // Right side, towards front
+        bobaCup.castShadow = true;
+        bobaCup.name = "Boba";
+        deskGroup.add(bobaCup); // Add to group
+        clickableObjects.push(bobaCup); // Add to clickableObjects array
+        // Headphones (Larger, Repositioned)
+        const headphoneGroup = new THREE.Group();
+        headphoneGroup.name = "Headphones";
+        // Position relative to desk center
+        headphoneGroup.position.set(1.8, objectBaseY, -0.5); // Far right, middle depth
+        headphoneGroup.rotation.y = THREE.MathUtils.degToRad(-30); // Angle them
+        deskGroup.add(headphoneGroup); // Add group to deskGroup
+        clickableObjects.push(headphoneGroup); // Add to clickableObjects array
+        const earCupRadius = 0.08 * scale;
+        const earCupThickness = 0.03 * scale;
+        const earCupGeo = new THREE.TorusGeometry(
+          earCupRadius,
+          earCupThickness,
+          8,
+          16
+        );
+        const earCupMat = new THREE.MeshStandardMaterial({
+          color: 0x222222,
+          metalness: 0.3,
+          roughness: 0.7,
+        });
+
+        const leftCup = new THREE.Mesh(earCupGeo, earCupMat);
+        leftCup.position.x = -0.1 * scale; // Adjust spacing based on scale
+        leftCup.rotation.y = Math.PI / 2;
+        leftCup.castShadow = true;
+        headphoneGroup.add(leftCup);
+
+        const rightCup = new THREE.Mesh(earCupGeo, earCupMat);
+        rightCup.position.x = 0.1 * scale; // Adjust spacing
+        rightCup.rotation.y = -Math.PI / 2;
+        rightCup.castShadow = true;
+        headphoneGroup.add(rightCup);
+
+        const headbandWidth = 0.04 * scale;
+        const headbandDepth = 0.25 * scale;
+        const headbandGeo = new THREE.BoxGeometry(
+          headbandWidth,
+          headbandWidth,
+          headbandDepth
+        );
+        const headband = new THREE.Mesh(headbandGeo, earCupMat);
+        headband.position.y = 0.08 * scale; // Adjust height
+        headband.rotation.x = Math.PI / 1.9;
+        headband.castShadow = true;
+        headphoneGroup.add(headband);
+
+        // Puzzle Piece (Larger, Repositioned)
+        const puzzleSize = 0.15 * scale;
+        const puzzleHeight = 0.03 * scale;
+        const puzzleGeo = new THREE.BoxGeometry(
+          puzzleSize,
+          puzzleHeight,
+          puzzleSize
+        );
+        const puzzleMat = new THREE.MeshStandardMaterial({
+          color: 0xff6347,
+          roughness: 0.8,
+        }); // Tomato color
+        const puzzlePiece = new THREE.Mesh(puzzleGeo, puzzleMat);
+        // Position relative to desk center
+        puzzlePiece.position.set(0.8, objectBaseY + puzzleHeight / 2, 1.0); // Middle-right, front
+        puzzlePiece.rotation.y = THREE.MathUtils.degToRad(45);
+        puzzlePiece.rotation.z = THREE.MathUtils.degToRad(10); // Tilt slightly
+        puzzlePiece.castShadow = true;
+        puzzlePiece.name = "Puzzle";
+        deskGroup.add(puzzlePiece); // Add to group
+        clickableObjects.push(puzzlePiece); // Add to clickableObjects array
+        // Book (Larger, Repositioned)
+        const bookWidth = 0.3 * scale;
+        const bookThickness = 0.05 * scale;
+        const bookDepth = 0.4 * scale;
+        const bookGeo = new THREE.BoxGeometry(
+          bookWidth,
+          bookThickness,
+          bookDepth
+        );
+        const bookMat = new THREE.MeshStandardMaterial({
+          color: 0x0077cc,
+          roughness: 0.7,
+        }); // Blue cover
+        const book = new THREE.Mesh(bookGeo, bookMat);
+        // Position relative to desk center
+        book.position.set(-1.8, objectBaseY + bookThickness / 2, 0.5); // Far left, front-mid
+        book.rotation.y = THREE.MathUtils.degToRad(25); // Angle more
+        book.castShadow = true;
+        book.name = "Book";
+        deskGroup.add(book); // Add to group
+        clickableObjects.push(book); // Add to clickableObjects array
+        // Diary (Larger, Repositioned)
+        const diaryWidth = 0.2 * scale;
+        const diaryThickness = 0.05 * scale;
+        const diaryDepth = 0.3 * scale;
+        const diaryGeo = new THREE.BoxGeometry(
+          diaryWidth,
+          diaryThickness,
+          diaryDepth
+        );
+        const diaryMat = new THREE.MeshStandardMaterial({
+          color: 0x8b4513,
+          roughness: 0.6,
+        }); // Saddle brown
+        const diary = new THREE.Mesh(diaryGeo, diaryMat);
+        // Position relative to desk center
+        diary.position.set(-1.5, objectBaseY + diaryThickness / 2, -0.8); // Left side, back
+        diary.rotation.y = THREE.MathUtils.degToRad(75); // Angle significantly
+        diary.castShadow = true;
+        diary.name = "Diary";
+        deskGroup.add(diary); // Add to group
+        clickableObjects.push(diary); // Add to clickableObjects array
+        console.log(
+          "Desk area objects added to group, scaled, and repositioned."
+        );
+      } // End of createDeskArea function
+
+      // ... (addLighting function - unchanged) ...
+      function addLighting() {
+        // Ambient Light
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+        scene.add(ambientLight);
+
+        // Point Light (Adjust for moved desk X)
+        const pointLight = new THREE.PointLight(0xffffff, 0.9, 18);
+
+        // Get desk center position (must match createDeskArea and init target)
+        const deskPosX = -3.4;
+        const deskPosZ = -3.4;
+
+        // Position light above the front-middle part of the NEW desk position
+        pointLight.position.set(deskPosX, 3.5, deskPosZ + 1.5); // Use new X, keep Y/relative Z
+        pointLight.castShadow = true;
+
+        // Shadow properties (Unchanged, but may need tweaking later)
+        pointLight.shadow.mapSize.width = 1024;
+        pointLight.shadow.mapSize.height = 1024;
+        pointLight.shadow.camera.near = 0.5;
+        pointLight.shadow.camera.far = 20;
+        pointLight.shadow.bias = -0.005;
+
+        scene.add(pointLight);
+
+        // Optional: Add a light helper
+        // const pointLightHelper = new THREE.PointLightHelper(pointLight, 0.5);
+        // scene.add(pointLightHelper);
+      }
+
+      // ... (onWindowResize, animate functions - unchanged) ...
+      function onWindowResize() {
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      }
+      function animate() {
+        requestAnimationFrame(animate);
+        const delta = clock.getDelta();
+        controls.update(delta);
+        renderer.render(scene, camera);
+      }
+
+      // --- Interaction Setup (Step 5) ---
+      let currentIntersected = null; // Keep track of the currently hovered object
+
+      function setupInteraction() {
+        console.log("Setting up Interaction (Step 5)...");
+        raycaster = new THREE.Raycaster();
+        mouse = new THREE.Vector2();
+
+        // Event Listeners
+        window.addEventListener("mousemove", onMouseMove, false);
+        window.addEventListener("click", onClick, false);
+        console.log("Interaction event listeners added.");
+      }
+
+      // Mouse Move Handler (Hover Effects)
+      function onMouseMove(event) {
+        // Calculate mouse position in normalized device coordinates (-1 to +1)
+        mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+        mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+
+        // Update the picking ray with the camera and mouse position
+        raycaster.setFromCamera(mouse, camera);
+
+        // Calculate objects intersecting the picking ray
+        const intersects = raycaster.intersectObjects(clickableObjects, true); // Check recursively
+
+        if (intersects.length > 0) {
+          // Find the top-level clickable object intersected
+          let targetObject = intersects[0].object;
+          while (
+            targetObject.parent &&
+            !clickableObjects.includes(targetObject)
+          ) {
+            // If the intersected object is a child (like headphone part), traverse up
+            if (targetObject === scene) break; // Safety break if somehow we reached the scene
+            targetObject = targetObject.parent;
+          }
+
+          // Check if the found target is actually in our list
+          if (clickableObjects.includes(targetObject)) {
+            if (currentIntersected !== targetObject) {
+              // New object hovered
+              currentIntersected = targetObject;
+              document.body.style.cursor = "pointer";
+              // TODO: Add highlight effect here (e.g., emissive color)
+              // Example: targetObject.material.emissive.setHex(0x555555); (Only works if material is unique or you handle groups)
+              console.log("Hovering over:", currentIntersected.name);
+            }
+          } else {
+            // Intersected something, but not a top-level clickable object's group/mesh
+            if (currentIntersected) {
+              // Moving off a previously hovered object
+              // TODO: Remove highlight effect here
+              // Example: currentIntersected.material.emissive.setHex(0x000000);
+              console.log("Stopped hovering over:", currentIntersected.name);
+            }
+            currentIntersected = null;
+            document.body.style.cursor = "default";
+          }
+        } else {
+          // No intersection
+          if (currentIntersected) {
+            // Moving off a previously hovered object
+            // TODO: Remove highlight effect here
+            // Example: currentIntersected.material.emissive.setHex(0x000000);
+            console.log("Stopped hovering over:", currentIntersected.name);
+          }
+          currentIntersected = null;
+          document.body.style.cursor = "default";
+        }
+      }
+
+      // Click Handler
+      function onClick(event) {
+        // Use the currently hovered object if available (slightly more robust)
+        if (currentIntersected) {
+          console.log("Clicked on:", currentIntersected.name);
+          triggerModalForObject(currentIntersected);
+        } else {
+          // Fallback: Do a raycast on click just in case mousemove missed it (optional)
+          mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+          mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+          raycaster.setFromCamera(mouse, camera);
+          const intersects = raycaster.intersectObjects(clickableObjects, true);
+
+          if (intersects.length > 0) {
+            let targetObject = intersects[0].object;
+            while (
+              targetObject.parent &&
+              !clickableObjects.includes(targetObject)
+            ) {
+              if (targetObject === scene) break;
+              targetObject = targetObject.parent;
+            }
+            if (clickableObjects.includes(targetObject)) {
+              console.log("Clicked on (fallback):", targetObject.name);
+              triggerModalForObject(targetObject);
+            }
+          }
+        }
+      }
+
+      // --- Modal Functions (Step 6 - Keep Existing) ---
+      // --- Modal Functions (Step 6) ---
+      function showModal(modalId) {
+        // REMOVE 'window.'
+        console.log("showModal function entered with ID:", modalId); // Log entry
+        const modal = document.getElementById(modalId);
+        console.log("Result of getElementById:", modal); // Log if element was found
+
+        if (modal) {
+          console.log("Modal element found, attempting to display."); // Log success
+          modal.style.display = "block";
+          setTimeout(() => {
+            modal.style.opacity = "1";
+            modal.style.transform = "translate(-50%, -50%) scale(1)";
+          }, 10);
+        } else {
+          console.error(
+            `Modal element with ID '${modalId}' NOT FOUND in HTML!`
+          ); // Log error
+        }
+      }
+
+      function hideModal(modalId) {
+        // REMOVE 'window.'
+        console.log("hideModal function entered with ID:", modalId); // Add log
+        const modal = document.getElementById(modalId);
+        if (modal) {
+          modal.style.opacity = "0";
+          modal.style.transform = "translate(-50%, -50%) scale(0.9)";
+          setTimeout(() => {
+            modal.style.display = "none";
+          }, 300);
+
+          if (modalId === "diary-modal") {
+            document.getElementById("diary-password-input").value = "";
+            document.getElementById("diary-feedback").textContent = "";
+            document.getElementById("diary-feedback").className = "";
+            document.getElementById("diary-content").style.display = "none";
+          }
+        } else {
+          console.error(
+            `hideModal: Modal element with ID '${modalId}' NOT FOUND!`
+          );
+        }
+      }
+
+      // Helper function to show the correct modal
+      function triggerModalForObject(object) {
+        if (!object || !object.name) return;
+
+        const objectName = object.name; // Get name once
+        console.log("Attempting to trigger modal for:", objectName); // Log entry
+
+        // Map object name to modal ID
+
+        let targetModalId = null; // Variable to hold the ID we want to show
+
+        switch (objectName) {
+          case "Laptop":
+            targetModalId = "laptop-modal";
+            break;
+          case "Boba":
+            targetModalId = "boba-modal";
+            break;
+          case "Headphones":
+            targetModalId = "headphones-modal";
+            break;
+          case "Puzzle":
+            targetModalId = "puzzle-modal";
+            break;
+          case "Book":
+            targetModalId = "book-modal";
+            break;
+          case "Diary":
+            targetModalId = "diary-modal";
+            break;
+          default:
+            console.log(
+              "Clicked object has no associated modal case:",
+              objectName
+            );
+        }
+
+        // If we found a matching modal ID, try to show it
+        if (targetModalId) {
+          console.log(
+            `Match found for '${objectName}', calling showModal('${targetModalId}')`
+          );
+          showModal(targetModalId);
+        } else {
+          console.log(`No modal ID found for object name '${objectName}'`);
+        }
+      }
+
+      function setupCloseButtons() {
+        console.log("Setting up close button listeners programmatically...");
+        const closeButtons = document.querySelectorAll(".close-button"); // Get all buttons by class
+        if (closeButtons.length > 0) {
+          closeButtons.forEach((button) => {
+            // Get the target modal ID from the data attribute we added
+            const modalId = button.dataset.modalId; // Access data-modal-id
+            if (modalId) {
+              button.addEventListener("click", () => {
+                // When this button is clicked...
+                console.log(
+                  `Programmatic listener: Close button clicked for modal '${modalId}'`
+                );
+                hideModal(modalId); // Call the LOCAL hideModal function
+              });
+            } else {
+              console.error(
+                "Close button found without a data-modal-id attribute:",
+                button
+              );
+            }
+          });
+          console.log(
+            `Added listeners programmatically to ${closeButtons.length} close buttons.`
+          );
+        } else {
+          console.warn("No elements with class 'close-button' found.");
+        }
+      }
+
+      // --- Diary Puzzle Logic (Step 7 - Keep Existing) ---
+      function setupDiaryPuzzle() {
+        const submitButton = document.getElementById("diary-submit-button");
+        const passwordInput = document.getElementById("diary-password-input");
+        const feedback = document.getElementById("diary-feedback");
+        const content = document.getElementById("diary-content");
+        const CORRECT_PASSWORD = "hello"; // Replace with your desired password
+
+        if (submitButton && passwordInput && feedback && content) {
+          submitButton.addEventListener("click", () => {
+            if (passwordInput.value === CORRECT_PASSWORD) {
+              feedback.textContent = "Success!";
+              feedback.className = "success";
+              content.style.display = "block";
+              // Add success animation later (Step 7)
+            } else {
+              feedback.textContent = "Incorrect password. Try again!";
+              feedback.className = "failure";
+              content.style.display = "none";
+              // Add failure feedback later (Step 7)
+            }
+          });
+        } else {
+          console.error("Diary puzzle elements not found!");
+        }
+      }
+
+      function setupModals() {
+        /* ... */
+      }
+      window.showModal = function (modalId) {
+        /* ... */
+      };
+      window.hideModal = function (modalId) {
+        /* ... */
+      };
+
+      // --- Start Everything ---
+      setupModals();
+      setupDiaryPuzzle();
+      init();
+      setupCloseButtons();
+    </script>
+  </body>
+</html>
