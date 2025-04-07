@@ -11,8 +11,7 @@ Total time taken: 2 hours (and a lot of scream-debugging)
 Techstack/technologies used:
 
 - Three.js
-- HTML/CSS
-- JavaScript
+- HTML
 
 # Demo!
 
