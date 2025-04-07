@@ -23,7 +23,7 @@ Techstack/technologies used:
 
 <img width="676" alt="totally not an AI generated text bubble with the [insert relevant text here] bits left in" src="https://github.com/user-attachments/assets/52bd2861-7994-48a0-b087-7c96999cf3e8" />
 
-### Installation
+### Installation (idk why you would install this but go wild ig)
 
 1.  Clone the repository:
     ```bash
@@ -33,7 +33,7 @@ Techstack/technologies used:
     ```bash
     cd w2-3d-about-me
     ```
-3.  Install the dependencies:
+3.  Run the server (or everything will be black) (don't say i didn't warn you):
     ```bash
-    npm install
+    python3 -m http.server
     ```
