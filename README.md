@@ -15,7 +15,7 @@ Techstack/technologies used:
 
 # Demo!
 
-## The table: 
+## The desk: 
 
 <img width="888" alt="desk." src="https://github.com/user-attachments/assets/cc53bd3a-53eb-4732-9781-8e11d4fd5242" />
 
