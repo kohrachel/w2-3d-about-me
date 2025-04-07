@@ -1,4 +1,4 @@
-# Pet the Rock
+# 3d About Me (it's a desk)
 
 Every week, [@zineanteoh](https://github.com/zineanteoh) and I give ourselves an hour to create a goofy project solely with AI. No human coding, any idea you can think of.
 
@@ -22,15 +22,7 @@ Techstack/technologies used:
 
 ## Make it happy!
 
-<img width="1624" alt="image" src="https://github.com/user-attachments/assets/28e66d04-025c-4cae-aa36-883726227f0b" />
-
-## Wait... what's that green thing?
-
-<img width="1624" alt="image" src="https://github.com/user-attachments/assets/e71591f3-b692-40ac-ada4-787f06bebcb9" />
-
-## It's growing?? What's happening???
-
-<img width="1624" alt="image" src="https://github.com/user-attachments/assets/9d1bdc45-6b31-48dd-96f8-e973711769e8" />
+<img width="676" alt="image" src="https://github.com/user-attachments/assets/52bd2861-7994-48a0-b087-7c96999cf3e8" />
 
 ### Installation
 
