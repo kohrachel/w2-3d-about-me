@@ -16,13 +16,13 @@ Techstack/technologies used:
 
 # Demo!
 
-## Pet the rock...
+## The table: 
 
-<img width="1624" alt="image" src="https://github.com/user-attachments/assets/061cdede-ac38-443a-8b72-428df362d4df" />
+<img width="888" alt="desk." src="https://github.com/user-attachments/assets/cc53bd3a-53eb-4732-9781-8e11d4fd5242" />
 
-## Make it happy!
+## I'm completely done with this project. Don't know why you think I'm not. 
 
-<img width="676" alt="image" src="https://github.com/user-attachments/assets/52bd2861-7994-48a0-b087-7c96999cf3e8" />
+<img width="676" alt="totally not an AI generated text bubble with the [insert relevant text here] bits left in" src="https://github.com/user-attachments/assets/52bd2861-7994-48a0-b087-7c96999cf3e8" />
 
 ### Installation
 
