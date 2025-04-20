@@ -1,4 +1,11 @@
-# 3d About Me (it's a desk)
+<pre align="center">
+✦ <b><i>Part 2</i></b> of the ⭐ <a href="https://github.com/kohrachel/60-min-coding">60-min coding</a> ⭐ series ✦
+    
+Every week, 🧑🏻‍💻 <a href="https://github.com/zineanteoh">@zineanteoh</a> and I give ourselves ⏰ <b>1 hour</b> ⏰ to make something with AI.
+Here are the version 0s of the coolest stuff we dreamed up.
+</pre> 
+
+# ✍🏻 3d About Me (it's a desk)
 
 Every week, [@zineanteoh](https://github.com/zineanteoh) and I give ourselves an hour to create a goofy project solely with AI. No human coding, any idea you can think of.
 
@@ -13,17 +20,17 @@ Techstack/technologies used:
 - Three.js
 - HTML
 
-# Demo!
+# 🥂 Demo Time!
 
-## The desk: 
+## 🎒 The desk: 
 
 <img width="888" alt="desk." src="https://github.com/user-attachments/assets/cc53bd3a-53eb-4732-9781-8e11d4fd5242" />
 
-## I'm completely done with this project. Don't know why you think I'm not. 
+## 🤔 I'm completely done with this project. Don't know why you think I'm not. 
 
 <img width="676" alt="totally not an AI generated text bubble with the [insert relevant text here] bits left in" src="https://github.com/user-attachments/assets/52bd2861-7994-48a0-b087-7c96999cf3e8" />
 
-### Installation (idk why you would install this but go wild ig)
+### 📦 Installation (idk why you would install this but go wild ig)
 
 1.  Clone the repository:
     ```bash
